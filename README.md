@@ -26,6 +26,7 @@ Em Processo:
 
     * fs.markdown
     * http.markdown
+    * buffer.markdown
 
 ### Como Contribuir
 
