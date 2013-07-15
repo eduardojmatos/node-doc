@@ -2,7 +2,55 @@
 
     Stability: 3 - Stable
 
-Pure JavaScript is Unicode friendly but not nice to binary data.  When
+Javascript puro é amigávelmente Unicode, mas não muito legal para binários. Quando lidamos com canais de TCP ou arquivos de sistema, é necessário lidar com transmissão de octetos. Node tem diversas estratégias para manipular, criar e consumir transmissão de octetos.
+
+Raw data é armazenada em instâncias da classe 'Buffer'. Um 'Buffer' é similar a um array de inteiros, mas corresponde a uma bruta alocação de memória fora da pilha da V8. Um 'Buffer' não pode ser redimensionado.
+
+Uma classe 'Buffer' é uma classe global, fazendo-a muito rara a necessidade do `require('buffer')`.
+
+Convertendo entre Buffers e objetos Javascript do tipo String, requerem um método de enconding explícito. Aqui estão diferentes econdings de strings.
+
+* `'ascii'` - para apenas 7 bit ASCII data. Esse método de enconding é muito rápido, e remove o bit mais alto se estiver definido.
+
+* `'utf8'` - Multibyte codificado em caracteres Unicode. Muitas páginas da web e outros formatos de documentos usam UTF-8.
+
+* `'utf16le'` - 2 ou 4 bytes, pequena codificação endian codificando caracteres Unicode.
+  Pares substitutos (U+10000 para U+10FFFF) são suportados.
+
+* `'ucs2'` - Alias do `'utf16le'`.
+
+* `'base64'` - encoding de string com Base64.
+
+* `'binary'` - Um caminho para encode de um binário para string usando somente os 8 primeiros bits de cada caracter. Esse método de enconding é obsoleto e deve ser evitado favorecendo objetos 'Buffer' onde possível. Esse enconding será removido nas futuras versões do Node.
+
+* `'hex'` - Encode cada byte como dois caracteres hexadecimal.
+
+## Classe: Buffer
+
+A classe Bugger é uma global para lidar com dados binários diretamente.
+Pode ser construída de várias maneiras.
+
+### new Buffer(tamanho)
+
+* `tamanho` Number
+
+Aloca um novo buffer de `tamanho` octeto.
+
+### new Buffer(array)
+
+* `array` Array
+
+Aloca um novo buffer usando um `array` de octetos.
+
+### new Buffer(str, [encoding])
+
+* `str` String - string para encode.
+* `encoding` String - encoding para usar, Opcional.
+
+Aloca um novo buffer contendo a `str` passada.
+O `encoding` padrão é o `'utf8'`.
+
+/* Pure JavaScript is Unicode friendly but not nice to binary data.  When
 dealing with TCP streams or the file system, it's necessary to handle octet
 streams. Node has several strategies for manipulating, creating, and
 consuming octet streams.
@@ -60,7 +108,7 @@ Allocates a new buffer using an `array` of octets.
 * `encoding` String - encoding to use, Optional.
 
 Allocates a new buffer containing the given `str`.
-`encoding` defaults to `'utf8'`.
+`encoding` defaults to `'utf8'`.*/
 
 ### Class Method: Buffer.isEncoding(encoding)
 
