@@ -14,8 +14,7 @@ Convertendo entre Buffers e objetos Javascript do tipo String, requerem um méto
 
 * `'utf8'` - Multibyte codificado em caracteres Unicode. Muitas páginas da web e outros formatos de documentos usam UTF-8.
 
-* `'utf16le'` - 2 ou 4 bytes, pequena codificação endian codificando caracteres Unicode.
-  Pares substitutos (U+10000 para U+10FFFF) são suportados.
+* `'utf16le'` - 2 ou 4 bytes, pequena codificação endian codificando caracteres Unicode. Pares substitutos (U+10000 para U+10FFFF) são suportados.
 
 * `'ucs2'` - Alias do `'utf16le'`.
 
@@ -27,7 +26,7 @@ Convertendo entre Buffers e objetos Javascript do tipo String, requerem um méto
 
 ## Classe: Buffer
 
-A classe Bugger é uma global para lidar com dados binários diretamente.
+A classe Buffer é uma global para lidar com dados binários diretamente.
 Pode ser construída de várias maneiras.
 
 ### new Buffer(tamanho)
@@ -49,6 +48,124 @@ Aloca um novo buffer usando um `array` de octetos.
 
 Aloca um novo buffer contendo a `str` passada.
 O `encoding` padrão é o `'utf8'`.
+
+### Método da Classe: Buffer.isEncoding(encoding)
+
+* `encoding` {String} A string encoding para testar
+
+Retorna true se o `encoding` é um argumento de encoding válido, ou falso caso não.
+
+### Método da Classe: Buffer.isBuffer(obj)
+
+* `obj` Object
+* Retorno: Boolean
+
+Testa se `obj` é um `Buffer`.
+
+### Método da Classe: Buffer.byteLength(string, [encoding])
+
+* `string` String
+* `encoding` String, Opcional, Default: 'utf8'
+* Retorno: Number
+
+Retorna o tamanho atual em bytes de uma string. `encoding` padrão é `'utf8'`.
+Isso não é o mesmo que `String.prototype.length` uma vez que esse retorna o número de *characters* de uma string.
+
+Exemplp:
+
+    str = '\u00bd + \u00bc = \u00be';
+
+    console.log(str + ": " + str.length + " characters, " +
+      Buffer.byteLength(str, 'utf8') + " bytes");
+
+    // ½ + ¼ = ¾: 9 caracteres, 12 bytes
+
+### Método da Classe: Buffer.concat(list, [totalLength])
+
+* `list` {Array} Lista de objetos Buffer para concatenar
+* `totalLength` {Number} Tamanho total de buffers quando concatenados
+
+Retorno um buffer o qual é o resultado da concatenação de todos os buffers numa lista juntos.
+
+Se a lista não tiver itens, ou se o totalLength é 0, então irá retornar um buffer de tamanho zero.
+
+Se a lista tem exatamente um item, então o primeiro item da list é retornado.
+
+Se a lista tem mais que um item, então um novo Buffer é criado.
+
+Se o totalLength não foi passado, é lido dos buffers na lista.
+Como sempre, isso fornece um loop adicional para a função, então é rápido prover o tamanho explicitamente.
+
+
+### Método da Classe: Buffer.alloc(length, [receiver])
+
+* `length` Number
+* `receiver` Object, Opcional, Default: `new Object`
+
+
+**(EXPERIMENTAL)** Retorna objecto com informações do array alocados externamente.
+
+Buffers são suportados por um simlpes alocador que lida apenas com a assinatura de memória bruta externa. Isso expõe essa funcionalidade.
+
+Nenhum agrupamento é executado para essas alocações. Então não há forma de vazamento de memória.
+
+Isso pode ser usado para criar sua própria classe no estilo Buffer.
+
+    function SimpleData(n) {
+      this.length = n;
+      Buffer.alloc(this.length, this);
+    }
+
+    SimpleData.prototype = { /* ... */ };
+
+
+### Método da Classe: Buffer.dispose(obj)
+
+* `obj` Object
+
+
+**(EXPERIMENTAL)** Libera memória que foi alocada para um objeto via `Buffer.alloc`.
+
+    var a = {};
+    Buffer.alloc(3, a);
+
+    // { '0': 0, '1': 0, '2': 0 }
+
+    Buffer.dispose(a);
+
+    // {}
+
+### buf.length
+
+* Number
+
+O tamanho to buffer em bytes. Note que isso não é necessariamente o tamanho do conteúdo. `length` refere-se à quantidade de memória alocada para o objeto buffer. Isso não muda wuando o conteúdo do buffer for mudado.
+
+    buf = new Buffer(1234);
+
+    console.log(buf.length);
+    buf.write("some string", 0, "ascii");
+    console.log(buf.length);
+
+    // 1234
+    // 1234
+
+### buf.write(string, [offset], [length], [encoding])
+
+* `string` String - informação a ser escrita no buffer
+* `offset` Number, Opcional, Default: 0
+* `length` Number, Opcional, Default: `buffer.length - offset`
+* `encoding` String, Opcional, Default: 'utf8'
+
+Escreve uma `string` para o  buffer em `offset` usando o encoding passado.
+
+`offset` padrão é `0`, `encoding` padrão é `'utf8'`. `length` é o número de bytes a ser escrito. Retorna o número de octetos escritos. Se `buffer` não conter espaço suficiente para caber a string inteira, irá escrever uma quantidade parcial da string. `length` padrão é `buffer.length - offset`.
+O método não irá escrever caracteres parciais.
+
+    buf = new Buffer(256);
+    len = buf.write('\u00bd + \u00bc = \u00be', 0);
+    console.log(len + " bytes: " + buf.toString('utf8', 0, len));
+
 
 /* Pure JavaScript is Unicode friendly but not nice to binary data.  When
 dealing with TCP streams or the file system, it's necessary to handle octet
@@ -108,7 +225,7 @@ Allocates a new buffer using an `array` of octets.
 * `encoding` String - encoding to use, Optional.
 
 Allocates a new buffer containing the given `str`.
-`encoding` defaults to `'utf8'`.*/
+`encoding` defaults to `'utf8'`.
 
 ### Class Method: Buffer.isEncoding(encoding)
 
@@ -185,6 +302,7 @@ This can be used to create your own Buffer-like classes.
     }
 
     SimpleData.prototype = { /* ... */ };
+
 
 ### Class Method: Buffer.dispose(obj)
 
